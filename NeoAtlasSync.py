@@ -32,7 +32,7 @@ parameter = {
     'CamFs' : 30,
     'before_win': 1,
     'after_win': 1,
-    'low_pass_filter_frequency': 20
+    'low_pass_filter_frequency': 80
     }
 
 pfw = 0
@@ -362,6 +362,7 @@ class singleday:
                 index = int(re.findall(r'\d+', file)[-1])
                 self.trails_dic[self.keynum[index-1]].AddAtlasFile(path)
                 
+                
     def Analysis(self):
         self.day_z = []
         
@@ -453,7 +454,7 @@ class mice:
                 path = os.path.join(DLC_folder,file)
                 day = singleday(path,file)
                 self.days.append(day)
-        
+                print(f"Day {day.day}")
         day_dic = {x.day: x for x in self.days}
         
         #Finding Bonsai folder
@@ -490,9 +491,6 @@ class mice:
                         
         fig,ax = PlotDicMean(dic,ylab='z_score_mean',title='z_score mean with error bar')
         fig.savefig(os.path.join(output_path,'CBSB_comparision'))
-        
-        
-        
         
         self.tot_reward_signal = pd.DataFrame()
         self.tot_leaving_signal = pd.DataFrame()
@@ -567,6 +565,7 @@ class mice:
             r = random.randint(0, len(self.tot_velocity['speed'])-1)
             neo_z.append(self.tot_velocity['speed'].iloc[r])
         ax = PlotRadianGraph(neo_z, self.tot_velocity['angle'], ax, label='Bootstrap Mean', color='orange', linestyle='--',title='mean of speed at different head direction')
+        ax = PlotRadianGraph(self.tot_velocity['z_score'], self.tot_velocity['angle'], ax, label='Original Mean')
         ax.legend()
         path = os.path.join(output_path,'angle')
         if not os.path.exists(path):
@@ -651,7 +650,7 @@ class group:
         for single_mouse in self.mouse:
             self.AUC_dif_tot = pd.concat([self.AUC_dif_tot, single_mouse.AUC_dif_tot], ignore_index=True)
         fig,ax = PlotDicMean(self.AUC_dif_tot,ylab='AUC_difference',title='All mice Mean AUC difference')
-        fig.savefig(os.path.join(output_path,'Tot_AUC_mean'))
+        fig.savefig(os.path.join(parameter['grandparent_folder'],'Tot_AUC_mean'))
 
         
 def PlotLinearRegression (x,y,ax):

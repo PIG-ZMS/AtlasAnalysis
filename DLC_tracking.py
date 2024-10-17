@@ -19,12 +19,12 @@ parameter = {
     'tracking_file_sufix': '.csv',
     'tracking_file_tag': 'DLC',
     'DLC_folder_tag': 'DLC_tracking',
-    'well_coord': [[496,214],[296,70]],
+    'well_coord': [[462,211],[314,372]],
     'bridge_coord': [[37,216],[100,258]],
-    'CB_centre': [308,224],
+    'CB_centre': [307,215],
     'CB_radius': 209,
     'detecting_radius': 15,
-    'point_of_no_return': 3,
+    'point_of_no_return': 1.5,
     'CamFs':30,
     'sig_level':0.9
     }
@@ -150,8 +150,8 @@ class trace:
             single_frame = frame([head_x,head_y],[shoulder_x,shoulder_y],[bottom_x,bottom_y])
             self.frames.append(single_frame)
         
-        self.Marking()
         self.SaveFile()
+        self.Marking()
         self.PlotTraceMap(max(self.start_frame,0),min(self.end_frame,len(self.frames)))
         
         
@@ -222,7 +222,7 @@ class trace:
                     self.BoarderForce['Event'].append('Approaching Well')
                     self.BoarderForce['Location'].append('Well'+str(frame.well_tag))
                     current_well = frame.well_tag
-            if (not (frame.IsCloseToWell()) and current_state == 'Inside'):
+            if (not frame.IsCloseToWell() and current_state == 'Inside'):
                 if self.BoarderPass(i,False):
                     current_state = 'Outside'
                     self.BoarderForce['Time'].append(i/frame_rate)
@@ -312,13 +312,6 @@ class trace:
             }
         for index,i in enumerate(self.frames):
             if index != 0:
-                #Turn on validity checking if the mouse has already left SB
-                if index/frame_rate>self.leave_SB:
-                     speed = Dis(self.frames[index-1].bottom,self.frames[index].bottom)*frame_rate
-                     #this indicate the exist of an outlier frame
-                     if self.frames[index].shoulder[0]==-1 or self.frames[index].shoulder[1]==-1:
-                         self.frames[index] = self.frames[index-1]
-                         
                 data['speed'].append(Dis(self.frames[index-1].shoulder,self.frames[index].shoulder)*frame_rate)
             else:
                 data['speed'].append(0)
@@ -390,6 +383,7 @@ class mice:
         print('Now reading:'+str(mouse_ID))
         for filename in os.listdir(parent_folder):
             if parameter['DLC_folder_tag'] in filename:
+                print(filename)
                 if 'day' in filename:
                     day = int(re.findall(r'\d+', filename.split('day')[1])[0])
                     folder = os.path.join(parent_folder,filename)
@@ -442,10 +436,11 @@ def ObtainFrameRate(parent_folder):
                     frame_rate = df.shape[0] / duration
                     
 global output_folder
-folder = 'D:/Photometry/test_tracking/1786534/'
+# folder = 'D:/Photometry/test_tracking/1786535/'
+folder = 'D:/Photometry/test_tracking/Group B/1756074/'
 ObtainFrameRate(folder)
 print('Frame is:'+str(frame_rate))
-a = mice(folder,'1786534')
+a = mice(folder,'1756074')
 
                 
                 
